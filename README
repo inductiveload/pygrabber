@@ -1,0 +1,212 @@
+pyGrabber is a program to download books from the Internet as a sequence 
+of images. These images can then be OCR'd, either by retrieval of OCR 
+from the online source, or by Tesseract. They can also be collated to 
+DjVu, with OCR text layer, or uploaded individually to Wikimedia Commons.
+
+DISCLAIMER:
+pyGrabber is to be used ONLY to download public domain book in a legal
+fashion. The capability of pyGrabber to download from a specific resource
+does not imply that you are allowed to, and you do so at your own risk.
+
+
+1) REQUIREMENTS ============================================================
+
+Due to pyGrabber's wide range of tasks, there are several dependencies
+
+    1)  python 2.x (2.6 is the development platform)
+        Upgrade to Python 3 will be done if and when there is sufficient 
+        demand, or when I migrate myself.
+        
+    2)  wxPython 2.8 for the GUI elements
+    
+    3)  LXML for the HTML parsing of webpages
+    
+    4)  pyWikipedia for the upload to Commons. Optional. You don't need
+        this if you don't intend to upload using pyGrabber.
+        
+    5)  djvulibre for the DJVU construction. Optional. You don't need this
+        if you won't convert to DJVU.
+        
+    6)  tesseract-ocr for the OCR (with lib-tiff support). Optional. You 
+        don't need this is you will not perform OCR. You may need it even 
+        if the source you are grabbing from provides OCR, as tesseract is 
+        the fallback option.
+
+2) USAGE ====================================================================
+
+    2.1) Setting up pyGrabber
+
+        Before you begin, you need to set USE_PYWIKIPEDIA to True or False
+        as appropriate.
+        
+        If you set USE_PYWIKIPEDIA True, you also need to provide the 
+        path to the PYWIKIPEDIA directory. Put this in PYWIKIPEDIA_PATH.
+
+        
+    2.2) Running pyGrabber
+
+        Running pyGrabber is as simple as running the pygrabber.py from 
+        the terminal. If you wish to upload files, you will need to 
+        respond to queries from pywikipedia in the terminal.
+        
+    2.3)  Setting up pyGrabber for a job
+
+        When you wish to begin a job, or "grab", you need to set the 
+        option in the Settings Panel on the left:
+        
+        Text ID:    The unique identifier for the work you are working on.
+                    See the "Sources" section for details.
+                    
+        Text Source: The Source you wish to download the text from. For a
+                    list of source, see the "Sources" section.
+                    
+        Pages:      The first and last page of the range you wish to 
+                    download, inclusive.
+                    
+        Guess from local files: Try to guess the first and last files 
+                    based on which files are already avaiable in the 
+                    local book directory.
+                    
+        Use a proxy: Whether or not to use a proxy to download. Use this if
+                    the source only delivers content to certain locations.
+                    
+        Proxy IP:   IP address (and, optionally, port) of the proxy server.
+                    eg. 111.222.333.444:80
+                    
+        Inter-fetch delay:  The delay between sequential fetches. This is
+                    for use on servers which don't have sufficent upload
+                    bandwidth, or on servers which will prevent rapid
+                    downloading from a single source.
+                    
+        Top directory:  The directory into which you wish to put the 
+                    directory holding the files for this grab.
+                    eg. C:\book-grabs
+                    
+        Custom book directory: If this is not selected, the book directory
+                    is set automatically, based on the top directory, source
+                    and text id. If this is selected, the directory is
+                    whatever is in the book-directory text box.
+                    
+        Book directory: The directory to store the grab files. If Custom 
+                    book directory is unset, you can't change this.
+        
+        Filename prefix: The prefix of the generated and uploaded files.
+        
+                    eg. Prefix = Filename here
+                    
+                    DJVU file:  Filename here.djvu
+                    Uploaded images: Filename here - 0001.jpg
+                    
+        Upload images: Whether you wish to upload individual images to 
+                    Wikimedia Commons. You need pyWikipedia if you select
+                    this option.
+                    
+        Force upload: Upload over files with the same name, useful if you
+                    made a mistake first time around. Not recommended
+                    otherwise.
+        
+        Template: The page template to provide as the image upload data.
+                    If the template given is "template name", the upload 
+                    data for the first image will be:
+                    
+                    {{template name|0001}}
+                    
+                    It is up to you to make sure this template exists and
+                    can handle the page number correctly. If you want
+                    more control over the data, such as specific parameters
+                    for different page, pyGrabber is the wrong tool for
+                    the pload.
+                    
+        Try to download missing images: If there are missing images in the
+                    sequence, try to download them from the specified 
+                    source. If this is not selected, missing pages will be
+                    skipped.
+                    
+        Convert to DjVu: Convert the sequence of images to DjVu
+        
+        Bitonal DjVu: Make thate DjVu black-and-white only. This is good for
+                    images that are already bitonal, and very long works
+                    which need to be drastically compressed to fit in
+                    100MB.
+
+        DjVu quality:   The quality of the DjVu image compression. This is 
+                    a number from 16 to 50. Only applies to some image
+                    file formats.
+                    
+        Perform OCR, add to DjVu: Perform OCR by either downloading from
+                    the specified source (only some sources provide OCR),
+                    or as a fallback option, Tesseract.
+                    
+        OCR language: Tesseract language. eg. eng for English.
+        
+        Use Tesseract if source page has no OCR : If the source has not 
+                    got any OCR for a page, select this option to generate
+                    it with Tesseract.
+        
+        Perform all OCR locally with Tesseract: Do not find OCR from the
+                    source, always use Tesseract. Useful if you are using
+                    pyGrabber just to collate files, not download them.
+                    
+                    Overrides the previous option.
+                    
+        Use any availabe previously generated OCR: If you made OCR before,
+                    don't bother fetching or generating new OCR.
+                    
+        Dump readable OCR: Provide a single concatenated OCR file at the 
+                    end of the process, in addition to the page files.
+                    
+        Cleanup images before OCR: Clean the images with an Imagemagick 
+                    script to try to improve OCR performance.
+                    
+        Cleanup commnd: This is the command you will use to perform the 
+                    cleaning. You can use the following strings to
+                    interpolate variables:
+                    
+                    %fin   the input file, from the source, or that you
+                            saved to the directory yourself
+                    %fout  the output file that will be used for OCR.
+                            this will be removed automatically.
+                    ;      split commands, if you need more than one 
+                            step
+                    
+                    Double quotes to surround arguments with spaces.
+                    \-escaping will not work. "This file" is right
+                    This\ file is not.
+                    
+                    Normal environment variables (such as $HOME, ~)
+                    can be used.
+                            
+                    Unicode must not be used, as shlex.split() doesn't 
+                    accept that in Python 2.x
+                        
+    2.4) Starting and ending a job
+        
+        To start the processing, click "Begin grab". This button will then
+        be greyed out and the "Abort grab" button will be enabled. The
+        files will be checked for existing local files, and then they will
+        be downloaded and processed one at a time. The DjVu will be
+        constructed one page at a time, as we go along.
+        
+        If you wish to abort a grab, click "Abort grab". The grab will be 
+        aborted once the current task is complete. The "start grab" button
+        will re-appear when this happens. Be aware that this could take 
+        a few seconds if the job is a long one (downloading and OCR
+        especially).
+        
+        If you wish to delete all the files in the directory and start
+        again, click "Delete all files". You will be prompted before 
+        deletion. This is useful for "do-overs".
+            
+    2.5) Using pyGrabber with local files only
+        
+        You can use pyGrabber to generate DjVu and OCR from local files
+        without fetching the images from a remote site.
+        
+        1)  Download the images to a local directory. Name them 0001.ext 
+            and so on.
+        2)  Select "Custm Book Directory" and enter the directory name 
+            in the "Book Directory" textbox
+        3)  Uncheck "Download missing images"
+        4)  Set other conversion options as normal
+        5)  Click begin - the files will appear in the file pane
+                

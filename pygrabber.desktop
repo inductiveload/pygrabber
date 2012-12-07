@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=0.1
+Type=Application
+Name=pyGrabber
+GenericName=PyGrabber image downloader
+Comment=Easily download books and collate to DjVu, with OCR
+Icon=/home/john/src/pygrabber/trunk/icons/grabber_48.png
+Exec=lxterminal --command="/home/john/src/pygrabber/trunk/pygrabber.py"
+Terminal=false
+MimeType=
+Categories=Internet;

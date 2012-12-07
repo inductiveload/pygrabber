@@ -1,0 +1,9 @@
+"""
+
+Useful text cleaning commands
+
+"""
+
+
+# Textcleaner greyscale followed by resize
+$HOME/src/textcleaner -g %fin %fout; convert %fout -resize 300% %fout
